@@ -4,8 +4,20 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "debug": "babel-node --nolazy --inspect-brk=9229 index.js"
   },
   "author": "Aruljothi Parthiban",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@babel/node": "^7.8.7",
+    "agentkeepalive": "^4.1.2",
+    "console.table": "^0.10.0",
+    "dns": "^0.2.2",
+    "node-netstat": "^1.8.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "babel-preset-latest-node": "^4.1.0"
+  }
 }
