@@ -1,30 +1,13 @@
 const keepaliveAgent = require('./lib/agent');
-const http = require('http');
 const fs = require('fs');
 const { performance } = require('perf_hooks');
+const { getUsers } = require('./services/users');
 
 const printSocketInfo = () => {
     if (keepaliveAgent.statusChanged) {
         console.log('[%s] agent status changed', Date());
         console.log(JSON.stringify(keepaliveAgent.getCurrentStatus(), null, 2));
     }
-};
-
-const invoke = (options) => {
-    return new Promise((resolve, reject) => {
-        const req = http.request(options, res => {
-            //console.log('STATUS: ' + res.statusCode);
-            //console.log('HEADERS: ' + JSON.stringify(res.headers));
-            res.setEncoding('utf8');
-            res.on('data', function (chunk) {
-                resolve(chunk);
-            });
-        });
-        req.on('error', e => {
-            reject(e);
-        });
-        req.end();
-    });
 };
 
 const secondsToHms = (d) => {
@@ -40,38 +23,15 @@ const secondsToHms = (d) => {
     return `${h}:${m}:${s}`;
 };
 
-const makeCall = async () => {
+const start = async () => {
     let startTime = performance.now();
     let length = 5;
-    let threadCount = 500;
+    let threadCount = 1;
     for (let index = 1; index <= length; index++) {
         try {
             let threads = [];
             for(let i = 0; i < threadCount; i++){
-                threads.push(invoke({
-                    host: 'google.co.in',
-                    port: 80,
-                    path: '/',
-                    method: 'GET',
-                    agent: keepaliveAgent,
-                }));
-                // if (i/2 === 0){
-                //     threads.push(invoke({
-                //         host: 'google.co.in',
-                //         port: 80,
-                //         path: '/',
-                //         method: 'GET',
-                //         agent: keepaliveAgent,
-                //     }));
-                // } else {
-                //     threads.push(invoke({
-                //         host: 'mail.google.com',
-                //         port: 80,
-                //         path: '/',
-                //         method: 'GET',
-                //         agent: keepaliveAgent,
-                //     }));
-                // }
+                threads.push(getUsers());
             }
             await Promise.all(threads);
             printSocketInfo();
@@ -89,4 +49,5 @@ fs.writeFileSync('process-id.txt', process.pid, 'utf-8');
 if (process.pid) {
     console.log('This process is your pid ' + process.pid);
 }
-makeCall();
+
+start();
