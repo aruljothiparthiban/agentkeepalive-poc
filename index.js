@@ -1,7 +1,7 @@
 const keepaliveAgent = require('./lib/agent');
 const fs = require('fs');
-const { performance } = require('perf_hooks');
 const { getUsers } = require('./services/users');
+import ExecutionTime from './lib/execution-time';
 
 const printSocketInfo = () => {
     if (keepaliveAgent.statusChanged) {
@@ -10,21 +10,8 @@ const printSocketInfo = () => {
     }
 };
 
-const secondsToHms = (d) => {
-    d = Number(d);
-    var h = Math.floor(d / 3600);
-    var m = Math.floor(d % 3600 / 60);
-    var s = Math.floor(d % 3600 % 60);
-
-    h = String(h).padStart(2, '0');
-    m = String(m).padStart(2, '0');
-    s = String(s).padStart(2, '0');
-    
-    return `${h}:${m}:${s}`;
-};
-
 const start = async () => {
-    let startTime = performance.now();
+    let execution = new ExecutionTime('Keet Alive');
     let length = 5;
     let threadCount = 1;
     for (let index = 1; index <= length; index++) {
@@ -40,8 +27,7 @@ const start = async () => {
             console.log(`${index} Problem with request: ` + err.message);
         }
     }
-    let timeTaken = (performance.now() - startTime) / 1000;
-    console.log(`execution time : ${secondsToHms(timeTaken)}`);
+    execution.end();
 };
 
 fs.writeFileSync('process-id.txt', process.pid, 'utf-8');
